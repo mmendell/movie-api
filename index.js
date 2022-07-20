@@ -18,27 +18,27 @@ const books = [
     {
         id: 1,
         title: 'the black swan',
-        details: { author: 'nassim nicholas taleb', genre: 'philosophy' }
+        details: { author: 'nassim nicholas taleb', genre: 'philosophy', release: '2007', series: 'incerto' }
     },
     {
         id: 2,
         title: 'think again',
-        details: { author: 'adam grant', genre: 'psychology' }
+        details: { author: 'adam grant', genre: 'psychology', release: '2021', series: 'self' }
     },
     {
         id: 3,
         title: 'the intelligent investor',
-        details: { author: 'benjamin graham', genre: 'finance' }
+        details: { author: 'benjamin graham', genre: 'finance', release: '1949', series: 'self' }
     },
     {
         id: 4,
         title: 'nudge',
-        details: { author: 'cass sunstein, richard thaler', genre: 'psychology' }
+        details: { author: 'cass sunstein, richard thaler', genre: 'psychology', release: '2011', series: 'final edition' }
     },
     {
         id: 5,
         title: 'the secret life of groceries',
-        details: { author: 'benjamin lorr', genre: 'social science' }
+        details: { author: 'benjamin lorr', genre: 'social science', release: '2018', series: 'self' }
     }
 ];
 
@@ -77,7 +77,7 @@ app.get('/books/:title', (req, res) => {
 // add data
 
 app.post('/books', (req, res) => {
-    const newBook = req.body;
+    let newBook = req.body;
 
     if (!newBook.title) {
         const message = 'you are lacking critical information';
