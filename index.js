@@ -1,12 +1,21 @@
-const express = require('express'),
-    bodyparser = require('body-parser'),
-    uuid = require('uuid'),
-    morgan = require('morgan');
+const express = require('express');
+const app = express();
+
+const bodyParser = require('body-parser');
+const uuid = require('uuid');
+const mongoose = require('mongoose');
+const Models = require('./models');
+const morgan = require('morgan');
+const Books = Models.Book;
+const Users = Models.User;
 
 const fs = require('fs');
 const path = require('path');
+const { error } = require('console');
+const { title } = require('process');
 
-const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
     flags: 'a'
@@ -14,33 +23,8 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
 
 app.use(morgan('combined', { stream: accessLogStream }));
 
-const books = [
-    {
-        id: 1,
-        title: 'the black swan',
-        details: { author: 'nassim nicholas taleb', genre: 'philosophy', release: '2007', series: 'incerto' }
-    },
-    {
-        id: 2,
-        title: 'think again',
-        details: { author: 'adam grant', genre: 'psychology', release: '2021', series: 'self' }
-    },
-    {
-        id: 3,
-        title: 'the intelligent investor',
-        details: { author: 'benjamin graham', genre: 'finance', release: '1949', series: 'self' }
-    },
-    {
-        id: 4,
-        title: 'nudge',
-        details: { author: 'cass sunstein, richard thaler', genre: 'psychology', release: '2011', series: 'final edition' }
-    },
-    {
-        id: 5,
-        title: 'the secret life of groceries',
-        details: { author: 'benjamin lorr', genre: 'social science', release: '2018', series: 'self' }
-    }
-];
+mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopolgy: true });
+
 
 // send you to home page
 
@@ -61,32 +45,122 @@ app.get('/documentation.html', (req, res) => {
 // get request to produce json of all books
 
 app.get('/books', (req, res) => {
-    res.json(books);
+    Books.find()
+        .then((books) => {
+            res.status(201).json(books);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error ' + err);
+        });
 });
 
 // individual book info
 
 app.get('/books/:title', (req, res) => {
-    res.json(
-        books.find((book) => {
-            return book.title === req.params.title;
+    Books.findOne({ title: req.params.title })
+        .then((book) => {
+            res.json(book);
         })
-    );
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error ' + err);
+        });
 });
 
-// add data
+// add book data
 
 app.post('/books', (req, res) => {
-    let newBook = req.body;
+    Books.findOne({ title: req.params.title })
+        .then((book) => {
+            if (book){
+                return res.status(400).send(req.params.title + 'book already exists.');
+            } else {
+                Books
+                    .create({
+                        title: req.body.title,
+                        description: req.body.description,
+                        genre: req.body.name,
+                    })
+            }
+        })
+});
 
-    if (!newBook.title) {
-        const message = 'you are lacking critical information';
-        res.status(400).send(message);
-    } else {
-        newBook.id === uuid.v4();
-        books.push(books);
-        res.status(201).send(newBook);
+// adds user
+
+app.post('/users', (req, res) => {
+    Users.findOne({ user: req.body.user })
+        // eslint-disable-next-line consistent-return
+        .then((user) => {
+            if (user) {
+                return res.status(400).send(req.body.Username + 'already exists.');
+            // eslint-disable-next-line no-else-return
+            } else {
+                Users
+                    .create({
+                        user: req.body.user,
+                        Password: req.params.password,
+                        email: req.params.email,
+                        birthday: req.params.birthday
+                    })
+                    .then((user) => { res.status(201).json(user);})
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).send('error' + error);
+                    });
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('error: ' + error);
+        });
+});
+
+// get all users
+
+app.get('/users', (req, res) => {
+    Users.find()
+        .then((users) => {
+            res.status(201).json(users);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error ' + error);
+        });
+});
+
+// get specific user
+
+app.get('/users/:user', (req, res) => {
+    Users.findOne({ user: req.params.user })
+        .then((user) => {
+            res.json(user);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error ' + err);
+        });
+});
+
+// update certain details
+
+app.put('/users/:user', (req, res) => {
+    Users.findOneAndUpdate({ user: req.params.user }, { $set: {
+        user: req.body.user,
+        password: req.params.password,
+        email: req.params.email,
+        birthday: req.params.birthday
     }
+    },
+    { new: true },
+    (err, updatedUser) => {
+        if(err) {
+            console.error(err);
+            res.status(500).send('Error ' + err);
+        } else {
+            res.json(updatedUser);
+        }
+    });
 });
 
 // removes an entry
