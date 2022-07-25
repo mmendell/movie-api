@@ -1,10 +1,11 @@
+/* eslint-disable prefer-const */
 const mongoose = require('mongoose');
 let bookSchema = mongoose.Schema({
     Title: { type: String, required: true },
     Description: { type: String, required: true },
     Genre: {
         Name: String,
-        Description: String,
+        Description: String
     },
     Author: {
         Name: String,
@@ -18,7 +19,7 @@ let userSchema = mongoose.Schema({
     password: { type: String, required: true },
     email: { type: String, required: true },
     birthday: Date,
-    favoriteBook: [{ type: mongoose.Schema.types.ObjectId, ref: 'Book' }]
+   // favoriteBook: [{ type: mongoose.Schema.types.ObjectId, ref: 'book' }]
 });
 
 let book = mongoose.model('Book', bookSchema);

@@ -1,30 +1,29 @@
-const express = require('express');
-const app = express();
-
-const bodyParser = require('body-parser');
-const uuid = require('uuid');
 const mongoose = require('mongoose');
 const Models = require('./models');
-const morgan = require('morgan');
+
 const Books = Models.Book;
 const Users = Models.User;
 
-const fs = require('fs');
-const path = require('path');
-const { error } = require('console');
-const { title } = require('process');
+const express = require('express'),
+    uuid = require('uuid'),
+    fs = require('fs'),
+    path = require('path');
 
+const app = express();
+
+const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopology: true});
+
+const morgan = require('morgan');
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
     flags: 'a'
 });
 
 app.use(morgan('combined', { stream: accessLogStream }));
-
-mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopolgy: true });
-
 
 // send you to home page
 
@@ -55,7 +54,7 @@ app.get('/books', (req, res) => {
         });
 });
 
-// individual book info
+// individual book info by title
 
 app.get('/books/:title', (req, res) => {
     Books.findOne({ title: req.params.title })
@@ -68,22 +67,30 @@ app.get('/books/:title', (req, res) => {
         });
 });
 
-// add book data
+// individual book data by genre
 
-app.post('/books', (req, res) => {
-    Books.findOne({ title: req.params.title })
+app.get('/books/:genre', (req, res) => {
+    Books.findOne({ genre: req.params.genre })
         .then((book) => {
-            if (book){
-                return res.status(400).send(req.params.title + 'book already exists.');
-            } else {
-                Books
-                    .create({
-                        title: req.body.title,
-                        description: req.body.description,
-                        genre: req.body.name,
-                    })
-            }
+            res.json(book);
         })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error ' + err);
+        });
+});
+
+// individual book by author
+
+app.get('/books/author:name', (req, res) => {
+    Books.findOne({ 'author.name': req.params.name })
+        .then((Book) => {
+            res.json(book);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error ' + err);
+        });
 });
 
 // adds user
@@ -103,7 +110,7 @@ app.post('/users', (req, res) => {
                         email: req.params.email,
                         birthday: req.params.birthday
                     })
-                    .then((user) => { res.status(201).json(user);})
+                    .then((user) => { res.status(201).json(user); })
                     .catch((error) => {
                         console.error(error);
                         res.status(500).send('error' + error);
@@ -125,7 +132,7 @@ app.get('/users', (req, res) => {
         })
         .catch((err) => {
             console.error(err);
-            res.status(500).send('Error ' + error);
+            res.status(500).send('Error ' + err);
         });
 });
 
@@ -145,16 +152,17 @@ app.get('/users/:user', (req, res) => {
 // update certain details
 
 app.put('/users/:user', (req, res) => {
-    Users.findOneAndUpdate({ user: req.params.user }, { $set: {
-        user: req.body.user,
-        password: req.params.password,
-        email: req.params.email,
-        birthday: req.params.birthday
-    }
+    Users.findOneAndUpdate({ user: req.params.user }, {
+        $set: {
+            user: req.body.user,
+            password: req.params.password,
+            email: req.params.email,
+            birthday: req.params.birthday
+        }
     },
     { new: true },
     (err, updatedUser) => {
-        if(err) {
+        if (err) {
             console.error(err);
             res.status(500).send('Error ' + err);
         } else {
@@ -166,13 +174,13 @@ app.put('/users/:user', (req, res) => {
 // removes an entry
 
 app.delete('/books/:id', (req, res) => {
-    const book = books.find((book) => {
+    const book = Books.find((book) => {
         return book.id === req.params.id;
     });
 
     if (book) {
         // eslint-disable-next-line no-const-assign
-        books = books.filter((obj) => {
+        Books = books.filter((obj) => {
             return obj.id !== req.params.id;
         });
         res.status(201).send(`The book ${req.params.id} was deleted.`);
