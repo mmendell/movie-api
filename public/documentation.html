@@ -49,15 +49,27 @@
         </tr>
         <tr>
             <td>/books/:title</td>
-            <td>gets specific books details through title</td>
+            <td>gets specific books details by using the books title as a parameter for a get request</td>
         </tr>
         <tr>
          <td> Post /books</td>  
          <td>Posts new book information to list of books assuming the criteria are met</td>
         </tr>
         <tr>
+            <td>GET books/:genre </td>
+            <td>will create request to get all books belonging to a  particular genre</td>
+        </tr>
+        <tr>
+            <td> GET books/author:Name</td>
+            <td>retrieves all books by that particular author</td>
+        </tr>
+        <tr>
+            <td>POST /users</td>
+            <td>if submitted through proper json formart will first check if that user is taken and if its not taken will create new user with those detials</td>
+        </tr>
+        <tr>
             <td>Delete /books/:id</td>
-            <td>deletes specific book from list based upon the books assigned ID</td>
+            <td>using the books object id and a delete request this deletes a particular book</td>
         </tr>
     </table>
 </body>
