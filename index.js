@@ -1,3 +1,4 @@
+/* eslint-disable one-var */
 const mongoose = require('mongoose');
 const Models = require('./models');
 
@@ -5,6 +6,7 @@ const Books = Models.Book;
 const Users = Models.User;
 
 const express = require('express'),
+    // eslint-disable-next-line no-unused-vars
     uuid = require('uuid'),
     fs = require('fs'),
     path = require('path');
@@ -14,6 +16,11 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+let auth = require('./auth')(app);
+
+const passport = require('passport');
+require('./passport');
 
 mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -43,7 +50,7 @@ app.get('/documentation.html', (req, res) => {
 
 // get request to produce json of all books
 
-app.get('/books', (req, res) => {
+app.get('/books', passport.authenticate('jwt', { session: false }), (req, res) => {
     Books.find()
         .then((books) => {
             res.status(201).json(books);
@@ -56,16 +63,12 @@ app.get('/books', (req, res) => {
 
 // individual book info by title
 
-app.get('/books/:title', (req, res) => {
-    console.log('random ', req.body)
-
+app.get('/books/:title', passport.authenticate('jwt', { session: false }), (req, res) => {
     Books.findOne({ title: req.params.title })
         .then((book) => {
             res.json(book);
-            console.log('random ', req.body)
         })
         .catch((err) => {
-            console.log('string2', req.body)
             console.error(err);
             res.status(500).send('Error ' + err);
         });
@@ -73,10 +76,10 @@ app.get('/books/:title', (req, res) => {
 
 // individual book data by genre
 
-app.get('/books/genre/:name', (req, res) => {
-    console.log('random stuff', req.body)
+app.get('/books/genre/:name', passport.authenticate('jwt', { session: false }), (req, res) => {
+    console.log('random stuff', req.body);
 
-    Books.findOne({ 'genre.name': req.body.name })
+    Books.findOne({ 'genre.name': req.params.name })
 
         .then((book) => {
             res.json(book);
@@ -89,8 +92,8 @@ app.get('/books/genre/:name', (req, res) => {
 
 // individual book by author
 
-app.get('/books/author/:name', (req, res) => {
-    console.log('random stuff', req.body)
+app.get('/books/author/:name', passport.authenticate('jwt', { session: false }), (req, res) => {
+    console.log('random stuff', req.body);
     Books.findOne({ 'author.name': req.params.name })
         .then((book) => {
             res.json(book);
@@ -133,7 +136,7 @@ app.post('/users', (req, res) => {
 
 // get all users
 
-app.get('/users', (req, res) => {
+app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.find()
         .then((users) => {
             res.status(201).json(users);
@@ -146,7 +149,7 @@ app.get('/users', (req, res) => {
 
 // get specific user
 
-app.get('/users/:user', (req, res) => {
+app.get('/users/:user', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOne({ user: req.params.user })
         .then((user) => {
             res.json(user);
@@ -159,7 +162,7 @@ app.get('/users/:user', (req, res) => {
 
 // update certain details
 
-app.put('/users/:user', (req, res) => {
+app.put('/users/:user', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOneAndUpdate({ user: req.params.user }, {
         $set: {
             user: req.body.user,
@@ -181,7 +184,7 @@ app.put('/users/:user', (req, res) => {
 
 // removes an entry
 
-app.delete('/books/:id', (req, res) => {
+app.delete('/books/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
     const book = Books.find((book) => {
         return book.id === req.params.id;
     });
@@ -196,7 +199,7 @@ app.delete('/books/:id', (req, res) => {
 
 // removes user by username
 
-app.delete('/users/:user', (req, res) => {
+app.delete('/users/:user', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOneAndRemove({ user: req.params.user })
         .then((user) => {
             if (!user) {
