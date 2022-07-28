@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>API Documentation</title>
+</head>
+
+<style>
+    table,
+    th,
+    td {
+        border: 3px solid;
+    }
+
+    body{
+        background-color: beige;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: larger;
+    }
+</style>
+
+<body>
+    <h1 id="page-title">Movie Info Page</h1>
+    <p>
+        all the information on thes pages is sourced through an api. <br> this api is built upon REST architecture. the
+        database will be built with MongoDB. <br> the business logic will be constructured mongoose. <br> the data from
+        the api will be provided in json format. <br> it will require user authentication. <br> all the source code will
+        be deployed publicly on github.
+    </p>
+
+    <table class="table-bordered">
+        <tr>
+            <th>URL</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>/</td>
+            <td>This is the primary homepage of the applicaton</td>
+        </tr>
+        <tr>
+            <td>/books</td>
+            <td>appending this will bring you to a json of all the data we have stored</td>
+        </tr>
+        <tr>
+            <td>/Documentation.html</td>
+            <td>this will lead to all Documentation</td>
+        </tr>
+        <tr>
+            <td>/books/:title</td>
+            <td>gets specific books details by using the books title as a parameter for a get request</td>
+        </tr>
+        <tr>
+         <td> Post /books</td>  
+         <td>Posts new book information to list of books assuming the criteria are met</td>
+        </tr>
+        <tr>
+            <td>GET books/:genre </td>
+            <td>will create request to get all books belonging to a  particular genre</td>
+        </tr>
+        <tr>
+            <td> GET books/author:Name</td>
+            <td>retrieves all books by that particular author</td>
+        </tr>
+        <tr>
+            <td>POST /users</td>
+            <td>if submitted through proper json formart will first check if that user is taken and if its not taken will create new user with those detials</td>
+        </tr>
+        <tr>
+            <td>Delete /books/:id</td>
+            <td>using the books object id and a delete request this deletes a particular book</td>
+        </tr>
+    </table>
+</body>
+
+</html>
