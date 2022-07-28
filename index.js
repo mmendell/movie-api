@@ -21,9 +21,9 @@ const cors = require('cors');
 let allowedOrgins = ['http://localhost:8080', 'http://testsite.com'];
 
 app.use(cors({
-    origin:(origin, callback) => {
+    origin: (origin, callback) => {
         if (!origin) return callback(null, true);
-        if(allowedOrgins.indexOf(origin) === -1) {
+        if (allowedOrgins.indexOf(origin) === -1) {
             let message = 'this applications CORS policy doesnt allow access from origin' + origin;
             return callback(null, true);
         }
@@ -68,7 +68,7 @@ app.get('/books', (req, res) => {
 app.get('/books/:title',
     // passport.authenticate('jwt', { session: false }),
     (req, res) => {
-        Books.findOne({ title: req.params.title })
+        Books.findOne({ 'title': req.params.title })
             .then((book) => {
                 res.json(book);
             })
@@ -80,7 +80,7 @@ app.get('/books/:title',
 
 // individual book data by genre
 
-app.get('/books/:genre',
+app.get('/books/genre/:name',
 // passport.authenticate('jwt', { session: false }),
     (req, res) => {
         console.log('random stuff', req.body);
@@ -98,17 +98,19 @@ app.get('/books/:genre',
 
 // individual book by author
 
-app.get('/books/author/:name', passport.authenticate('jwt', { session: false }), (req, res) => {
-    console.log('random stuff', req.body);
-    Books.findOne({ 'author.name': req.params.name })
-        .then((book) => {
-            res.json(book);
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error ' + err);
-        });
-});
+app.get('/books/author/:name',
+    // passport.authenticate('jwt', { session: false }), 
+    (req, res) => {
+        console.log('random stuff', req.body);
+        Books.findOne({ 'author.name': req.params.name })
+            .then((book) => {
+                res.json(book);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error ' + err);
+            });
+    });
 
 // adds user
 
@@ -143,7 +145,7 @@ app.post('/users', (req, res) => {
 // get all users
 
 app.get('/users',
-   // passport.authenticate('jwt', { session: false }), 
+    // passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Users.find()
             .then((users) => {
@@ -196,25 +198,27 @@ app.post('/books', (req, res) => {
 
 // get specific user
 
-app.get('/users/:user', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Users.findOne({ user: req.params.user })
-        .then((user) => {
-            res.json(user);
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error ' + err);
-        });
-});
+app.get('/users/:username',
+    passport.authenticate('jwt',
+        { session: false }), (req, res) => {
+        Users.findOne({ user: req.params.username })
+            .then((user) => {
+                res.json(user);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error ' + err);
+            });
+    });
 
 // update certain details
 
-app.put('/users/:user',
+app.put('/users/:username',
     // passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Users.findOneAndUpdate({ user: req.params.user }, {
             $set: {
-                user: req.body.user,
+                user: req.body.username,
                 password: req.params.password,
                 email: req.params.email,
                 birthday: req.params.birthday
@@ -268,20 +272,22 @@ app.delete('/books/:id', passport.authenticate('jwt', { session: false }), (req,
 
 // removes user by username
 
-app.delete('/users/:user', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Users.findOneAndRemove({ user: req.params.user })
-        .then((user) => {
-            if (!user) {
-                res.status(400).send(req.params.user + ' was not found');
-            } else {
-                res.status(200).send(req.params.user + ' was deleted.');
-            }
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error: ' + err);
-        });
-});
+app.delete('/users/:username',
+//    passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        Users.findOneAndRemove({ 'username': req.params.username })
+            .then((user) => {
+                if (!user) {
+                    res.status(400).send(req.params.username + ' was not found');
+                } else {
+                    res.status(200).send(req.params.username + ' was deleted.');
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error: ' + err);
+            });
+    });
 
 // error handling
 
