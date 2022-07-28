@@ -1,5 +1,5 @@
 const passport = require('passport'),
-    LocalStrategy = require('passport-local'),
+    LocalStrategy = require('passport-local').Strategy,
     Models = require('./models.js'),
     passportJWT = require('passport-jwt');
 
@@ -10,12 +10,12 @@ let users = Models.users,
 passport.use(
     new LocalStrategy(
         {
-            userField: 'Username',
-            passwordField: 'Password',
+            usernameField: 'Username',
+            passwordField: 'Password'
         },
-        (user, password, callback) => {
-            console.log(user + ' ' + password);
-            users.findONe({ User: user }, (error, user) => {
+        (username, password, callback) => {
+            console.log(username + ' ' + password);
+            Users.findONe({ Username: username }, (error, user) => {
                 if (error) {
                     console.log(error);
                     return callback(error);

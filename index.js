@@ -17,6 +17,19 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const cors = require('cors');
+let allowedOrgins = ['http://localhost:8080', 'http://testsite.com'];
+
+app.use(cors({
+    origin:(origin, callback) => {
+        if (!origin) return callback(null, true);
+        if(allowedOrgins.indexOf(origin) === -1) {
+            let message = 'this applications CORS policy doesnt allow access from origin' + origin;
+            return callback(null, true);
+        }
+    }
+}));
+
 let auth = require('./auth')(app);
 
 const passport = require('passport');
@@ -25,6 +38,7 @@ require('./passport');
 mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const morgan = require('morgan');
+const { callbackify } = require('util');
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
     flags: 'a'
@@ -32,25 +46,13 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
 
 app.use(morgan('combined', { stream: accessLogStream }));
 
-// send you to home page
-
-app.get('/', (req, res) => {
-    res.send('welcome to my page');
-});
-
 // handling for static pages
 
 app.use(express.static('public'));
 
-// handles basic documentation page
-
-app.get('/documentation.html', (req, res) => {
-    res.send('succesful get request to get data of all books stored');
-});
-
 // get request to produce json of all books
 
-app.get('/books', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/books', (req, res) => {
     Books.find()
         .then((books) => {
             res.status(201).json(books);
@@ -63,32 +65,36 @@ app.get('/books', passport.authenticate('jwt', { session: false }), (req, res) =
 
 // individual book info by title
 
-app.get('/books/:title', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Books.findOne({ title: req.params.title })
-        .then((book) => {
-            res.json(book);
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error ' + err);
-        });
-});
+app.get('/books/:title',
+    // passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        Books.findOne({ title: req.params.title })
+            .then((book) => {
+                res.json(book);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error ' + err);
+            });
+    });
 
 // individual book data by genre
 
-app.get('/books/genre/:name', passport.authenticate('jwt', { session: false }), (req, res) => {
-    console.log('random stuff', req.body);
+app.get('/books/:genre',
+// passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        console.log('random stuff', req.body);
 
-    Books.findOne({ 'genre.name': req.params.name })
+        Books.findOne({ 'genre.name': req.params.name })
 
-        .then((book) => {
-            res.json(book);
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error ' + err);
-        });
-});
+            .then((genre) => {
+                res.json(genre);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error ' + err);
+            });
+    });
 
 // individual book by author
 
@@ -107,7 +113,7 @@ app.get('/books/author/:name', passport.authenticate('jwt', { session: false }),
 // adds user
 
 app.post('/users', (req, res) => {
-    Users.findOne({ user: req.body.user })
+    Users.findOne({ username: req.body.username })
         // eslint-disable-next-line consistent-return
         .then((user) => { 
             if (user) {
@@ -116,7 +122,7 @@ app.post('/users', (req, res) => {
             } else {
                 Users
                     .create({
-                        user: req.body.user,
+                        username: req.body.username,
                         password: req.body.password,
                         email: req.body.email,
                         birthday: req.body.birthday
@@ -124,7 +130,7 @@ app.post('/users', (req, res) => {
                     .then((user) => { res.status(201).json(user); })
                     .catch((error) => {
                         console.error(error);
-                        res.status(500).send('error' + error);
+                        res.status(500).send ('error' + error);
                     });
             }
         })
@@ -136,14 +142,55 @@ app.post('/users', (req, res) => {
 
 // get all users
 
-app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Users.find()
-        .then((users) => {
-            res.status(201).json(users);
+app.get('/users',
+   // passport.authenticate('jwt', { session: false }), 
+    (req, res) => {
+        Users.find()
+            .then((users) => {
+                res.status(201).json(users);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error ' + err);
+            });
+    });
+
+// post new book
+
+app.post('/books', (req, res) => {
+    Books.findOne({ title: req.body.title })
+        // eslint-disable-next-line consistent-return
+        .then((book) => {
+            console.log('gsdfg', req.body);
+            if (book) {
+                console.log('sdad1', req.body);
+                return res.status(400).send(req.body.book + 'already exists.');
+            // eslint-disable-next-line no-else-return
+            } else {
+                Books
+                    .create({
+                        title: req.body.title,
+                        description: req.body.description,
+                        genre: {
+                            name: req.body.name,
+                            description: req.body.description
+                        },
+                        author: {
+                            name: req.body.name,
+                            bio: req.body.bio,
+                            birth: req.body.birth
+                        }
+                    })
+                    .then((book) => { res.status(201).json(book); })
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).send('error' + error);
+                    });
+            }
         })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error ' + err);
+        .catch((error) => {
+            console.error('something new', error);
+            res.status(500).send('error: ' + error);
         });
 });
 
@@ -162,25 +209,47 @@ app.get('/users/:user', passport.authenticate('jwt', { session: false }), (req, 
 
 // update certain details
 
-app.put('/users/:user', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Users.findOneAndUpdate({ user: req.params.user }, {
-        $set: {
-            user: req.body.user,
-            password: req.params.password,
-            email: req.params.email,
-            birthday: req.params.birthday
-        }
-    },
-    { new: true },
-    (err, updatedUser) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error ' + err);
-        } else {
-            res.json(updatedUser);
-        }
+app.put('/users/:user',
+    // passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        Users.findOneAndUpdate({ user: req.params.user }, {
+            $set: {
+                user: req.body.user,
+                password: req.params.password,
+                email: req.params.email,
+                birthday: req.params.birthday
+            }
+        },
+        { new: true },
+        (err, updatedUser) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Error ' + err);
+            } else {
+                res.json(updatedUser);
+            }
+        });
     });
-});
+
+// add favoriteBook
+
+app.post('/users/:username/books/:bookId',
+    // passport.authenticate('jwt', { session: false }),
+
+    (req, res) => {
+        Users.findOneAndUpdate({ username: req.params.username }, {
+            $push: { favoriteBooks: req.params.bookId }
+        },
+        { new: true},
+        (err, updatedUser) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('error: ' + err);
+            } else {
+                res.json(updatedUser);
+            }
+        });
+    });
 
 // removes an entry
 

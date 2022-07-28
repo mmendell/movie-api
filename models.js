@@ -9,14 +9,15 @@ const bookSchema = mongoose.Schema({
     },
     author: {
         name: String,
-        bio: String
+        bio: String,
+        birth: String
     },
     featured: Boolean
 });
 
 let userSchema = mongoose.Schema({
     email: { type: String, required: true },
-    user: { type: String, required: true },
+    username: { type: String, required: true },
     password: { type: String, required: true },
     birthday: Date,
     favoriteBook: [{ type: mongoose.Schema.Types.ObjectId, ref: 'book' }]
