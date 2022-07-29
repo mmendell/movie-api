@@ -21,15 +21,16 @@ module.exports = (router) => {
             if (error || !user) {
                 return res.status(400).json({
                     message: 'SOmething is wrong',
-                    user: user
+                    user
                 });
             }
             req.login(user, { session: false }, (error) => {
                 if (error) {
                     res.send(error);
                 }
+                console.log(user);
                 // eslint-disable-next-line prefer-const
-                let token = genterateJWTToken(user.toJson());
+                let token = genterateJWTToken(user.toJSON());
                 return res.json({ user, token });
             });
         })(req, res);

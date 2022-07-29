@@ -1,5 +1,8 @@
 /* eslint-disable prefer-const */
 const mongoose = require('mongoose');
+
+const bcrypt = require('bcrypt');
+
 const bookSchema = mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
@@ -22,6 +25,14 @@ let userSchema = mongoose.Schema({
     birthday: Date,
     favoriteBook: [{ type: mongoose.Schema.Types.ObjectId, ref: 'book' }]
 });
+
+userSchema.statics.hashPassword = (password) => {
+    return bcrypt.hashSync(password, 10);
+};
+
+userSchema.methods.validatePassword = function (password) {
+    return bcrypt.compareSync(password, this.password);
+};
 
 const book = mongoose.model('Book', bookSchema);
 const user = mongoose.model('User', userSchema);
