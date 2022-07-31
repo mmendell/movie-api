@@ -311,6 +311,7 @@ app.use((err, req, res, next) => {
     res.status(500).send('something broke');
 });
 
-app.listen(8080, () => {
-    console.log('your listening on port 8080');
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0', () => {
+    console.log('Your listening on Port ' + port);
 });
