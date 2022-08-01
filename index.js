@@ -122,13 +122,13 @@ app.get('/books/author/:name',
 
 app.post('/users',
     [check('username', 'username is required').isLength({ min: 5 }),
-        check('username', 'username only contains nin alphanumeric characters - not allowed').isAlphanumeric(),
+        check('username', 'username only contains non alphanumeric characters - not allowed').isAlphanumeric(),
         check('password', 'password is required').not().isEmpty,
         check('email', 'email does not appear to be valid').isEmail()],
     (req, res) => {
         let errors = validationResult(req);
 
-        if (errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
         }
 
