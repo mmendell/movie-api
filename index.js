@@ -37,9 +37,9 @@ let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
-// mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopology: true });
 
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+// mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 const morgan = require('morgan');
@@ -121,12 +121,14 @@ app.get('/books/author/:name',
 // adds user
 
 app.post('/users',
-    [check('username', 'username is required').isLength({ min: 5 }),
+    [
+        check('username', 'username is required').isLength({ min: 5 }),
         check('username', 'username only contains non alphanumeric characters - not allowed').isAlphanumeric(),
-        check('password', 'password is required').not().isEmpty,
-        check('email', 'email does not appear to be valid').isEmail()],
+        check('password', 'password is required').not().isEmpty(),
+        check('email', 'email does not appear to be valid').isEmail()
+    ],
     (req, res) => {
-        let errors = validationResult(req);
+        const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
@@ -314,7 +316,11 @@ app.use((err, req, res, next) => {
     res.status(500).send('something broke');
 });
 
-const port = process.env.PORT || 8080;
-app.listen(port, '0.0.0.0', () => {
-    console.log('Your listening on Port ' + port);
+// const port = process.env.PORT || 8080;
+// app.listen(port, '0.0.0.0', () => {
+//     console.log('Your listening on Port ' + port);
+// });
+
+app.listen(8080, () => {
+    console.log('your listening on port 8080');
 });

@@ -16,8 +16,12 @@ let genterateJWTToken = (user) => {
 
 module.exports = (router) => {
     router.post('/login', (req, res) => {
+        console.log('udfk', req.body);
+
         // eslint-disable-next-line consistent-return
         passport.authenticate('local', { session: false }, (error, user, info) => {
+            console.log('udfk', req.body);
+
             if (error || !user) {
                 return res.status(400).json({
                     message: 'SOmething is wrong',
