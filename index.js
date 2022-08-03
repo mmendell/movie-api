@@ -1,4 +1,3 @@
-/* eslint-disable one-var */
 const mongoose = require('mongoose');
 const Models = require('./models');
 
@@ -6,7 +5,6 @@ const Books = Models.Book;
 const Users = Models.User;
 
 const express = require('express'),
-    // eslint-disable-next-line no-unused-vars
     uuid = require('uuid'),
     fs = require('fs'),
     path = require('path');
@@ -51,7 +49,7 @@ app.use(express.static('public'));
 
 app.get(
     '/books',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Books.find()
             .then((books) => {
@@ -142,26 +140,23 @@ app.post(
 
         let hashedPassword = Users.hashPassword(req.body.password);
         Users.findOne({ username: req.body.username })
-        // eslint-disable-next-line consistent-return
             .then((user) => {
                 if (user) {
                     return res.status(400).send(req.body.user + 'already exists.');
-                    // eslint-disable-next-line no-else-return
-                } else {
-                    Users.create({
-                        username: req.body.username,
-                        password: hashedPassword,
-                        email: req.body.email,
-                        birthday: req.body.birthday
-                    })
-                        .then((user) => {
-                            res.status(201).json(user);
-                        })
-                        .catch((error) => {
-                            console.error(error);
-                            res.status(500).send('error' + error);
-                        });
                 }
+                Users.create({
+                    username: req.body.username,
+                    password: hashedPassword,
+                    email: req.body.email,
+                    birthday: req.body.birthday
+                })
+                    .then((user) => {
+                        res.status(201).json(user);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).send('error' + error);
+                    });
             })
             .catch((error) => {
                 console.error('something new', error);
