@@ -18,21 +18,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cors = require('cors');
-let allowedOrgins = ['*'];
 
-app.use(
-    cors({
-        origin: (origin, callback) => {
-            if (!origin) return callback(null, true);
-            if (allowedOrgins.indexOf(origin) === -1) {
-                let message =
-          'this applications CORS policy doesnt allow access from origin' +
-          origin;
-                return callback(null, true);
-            }
-        }
-    })
-);
+app.use(cors());
 
 const { check, validationResult } = require('express-validator');
 
