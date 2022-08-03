@@ -56,6 +56,7 @@ app.get(
         Books.find()
             .then((books) => {
                 res.status(201).json(books);
+                console.log('random', req.body);
             })
             .catch((err) => {
                 console.error(err);
