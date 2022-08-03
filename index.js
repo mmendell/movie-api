@@ -28,7 +28,7 @@ require('./passport');
 
 // mongoose.connect('mongodb://localhost:27017/books', { useNewUrlParser: true, useUnifiedTopology: true });
 
-mongoose.connect('mongodb+srv://mendel:rzI2AYW5i7VOCs1O@mainbooks.oostx.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect(process.env.CONNECTION_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
