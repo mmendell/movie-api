@@ -49,7 +49,7 @@ app.use(express.static('public'));
 
 app.get(
     '/books',
-    passport.authenticate('jwt', { session: false }),
+    // passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Books.find()
             .then((books) => {
