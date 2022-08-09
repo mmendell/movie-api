@@ -49,7 +49,7 @@ app.use(express.static('public'));
 
 app.get(
     '/books',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Books.find()
             .then((books) => {
@@ -67,7 +67,7 @@ app.get(
 
 app.get(
     '/books/:title',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Books.findOne({ title: req.params.title })
             .then((book) => {
@@ -84,7 +84,7 @@ app.get(
 
 app.get(
     '/books/genre/:name',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         console.log('random stuff', req.body);
 
@@ -104,7 +104,7 @@ app.get(
 
 app.get(
     '/books/author/:name',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         console.log('random stuff', req.body);
         Books.findOne({ 'author.name': req.params.name })
@@ -138,7 +138,7 @@ app.post(
             return res.status(422).json({ errors: errors.array() });
         }
 
-        let hashedPassword = Users.hashPassword(req.body.password);
+        const hashedPassword = Users.hashPassword(req.body.password);
         Users.findOne({ username: req.body.username })
             .then((user) => {
                 if (user) {
@@ -169,7 +169,7 @@ app.post(
 
 app.get(
     '/users',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Users.find()
             .then((users) => {
@@ -186,7 +186,7 @@ app.get(
 
 app.post(
     '/books',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Books.findOne({ title: req.body.title })
         // eslint-disable-next-line consistent-return
@@ -230,7 +230,7 @@ app.post(
 
 app.get(
     '/users/:username',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Users.findOne({ user: req.params.username })
             .then((user) => {
@@ -247,7 +247,7 @@ app.get(
 
 app.put(
     '/users/:username',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Users.findOneAndUpdate(
             { user: req.params.user },
@@ -276,7 +276,7 @@ app.put(
 
 app.post(
     '/users/:username/books/:bookId',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
 
     (req, res) => {
         Users.findOneAndUpdate(
@@ -301,7 +301,7 @@ app.post(
 
 app.delete(
     '/books/:id',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         const book = Books.find((book) => {
             return book.id === req.params.id;
@@ -320,7 +320,7 @@ app.delete(
 
 app.delete(
     '/users/:username',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Users.findOneAndRemove({ username: req.params.username })
             .then((user) => {

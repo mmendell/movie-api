@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 const mongoose = require('mongoose');
 
 const bcrypt = require('bcrypt');
@@ -18,7 +17,7 @@ const bookSchema = mongoose.Schema({
     featured: Boolean
 });
 
-let userSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
     email: { type: String, required: true },
     username: { type: String, required: true },
     password: { type: String, required: true },
