@@ -21,6 +21,7 @@ const userSchema = mongoose.Schema({
     email: { type: String, required: true },
     username: { type: String, required: true },
     password: { type: String, required: true },
+    name: { type: String, required: true },
     birthday: Date,
     favoriteBook: [{ type: mongoose.Schema.Types.ObjectId, ref: 'book' }]
 });
