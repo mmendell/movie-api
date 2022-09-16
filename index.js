@@ -232,7 +232,7 @@ app.get(
     '/users/:username',
     passport.authenticate('jwt', { session: false }),
     (req, res) => {
-        Users.findOne({ user: req.params.username })
+        Users.findOne({ username: req.params.username })
             .then((user) => {
                 res.json(user);
             })
@@ -319,7 +319,7 @@ app.delete(
 // removes user by username
 
 app.delete(
-    '/users/:username',
+    '/users/:email',
     passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Users.findOneAndRemove({ username: req.params.username })
