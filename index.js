@@ -297,6 +297,31 @@ app.post(
     }
 );
 
+// removes favorite book
+
+app.delete(
+    '/users/:username/books/:bookId',
+    passport.authenticate('jwt', { session: false }),
+
+    (req, res) => {
+        Users.findOneAndUpdate(
+            { username: req.params.username },
+            {
+                $push: { favoriteBooks: req.params.bookId }
+            },
+            { new: true },
+            (err, updatedUser) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).send('error: ' + err);
+                } else {
+                    res.json(updatedUser);
+                }
+            }
+        );
+    }
+);
+
 // removes an entry
 
 app.delete(
@@ -342,6 +367,7 @@ app.delete(
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('something broke');
+    console.log(err);
 });
 
 const port = process.env.PORT || 8080;
