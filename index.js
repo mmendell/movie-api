@@ -282,7 +282,7 @@ app.post(
         Users.findOneAndUpdate(
             { username: req.params.username },
             {
-                $push: { favoriteBooks: req.params.bookId }
+                $push: { favoriteBook: req.params.bookId }
             },
             { new: true },
             (err, updatedUser) => {
