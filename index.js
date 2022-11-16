@@ -307,7 +307,7 @@ app.delete(
         Users.findOneAndUpdate(
             { username: req.params.username },
             {
-                $push: { favoriteBook: req.params.bookId }
+                $pull: { favoriteBook: req.params.bookId }
             },
             { new: true },
             (err, updatedUser) => {
