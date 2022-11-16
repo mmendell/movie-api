@@ -282,7 +282,7 @@ app.post(
         Users.findOneAndUpdate(
             { username: req.params.username },
             {
-                $push: { favoriteBook: req.params.bookId }
+                $push: { favoriteBook``: req.params.bookId }
             },
             { new: true },
             (err, updatedUser) => {
@@ -307,7 +307,7 @@ app.delete(
         Users.findOneAndUpdate(
             { username: req.params.username },
             {
-                $pull: { favoriteBook: req.params.bookId }
+                $push: { favoriteBooks: req.params.bookId }
             },
             { new: true },
             (err, updatedUser) => {
@@ -344,7 +344,7 @@ app.delete(
 // removes user by username
 
 app.delete(
-    '/users/:email',
+    '/users/:username',
     passport.authenticate('jwt', { session: false }),
     (req, res) => {
         Users.findOneAndRemove({ username: req.params.username })
