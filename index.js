@@ -41,12 +41,16 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
 
 app.use(morgan('combined', { stream: accessLogStream }));
 
-// handling for static pages
+/**
+ * handling for static pages
+ */
 
 app.use(express.static('public'));
 
-// get request to produce json of all books
-
+/**
+ * endpoint returning json of all books is /books
+ * this is a get request
+ */
 app.get(
     '/books',
     passport.authenticate('jwt', { session: false }),
@@ -63,7 +67,10 @@ app.get(
     }
 );
 
-// individual book info by title
+/**
+ * get request to return individual title
+ * /books/:title append the title
+ */
 
 app.get(
     '/books/:title',
@@ -80,7 +87,10 @@ app.get(
     }
 );
 
-// individual book data by genre
+/**
+ * get request to get particular genre info
+ * /books/genre/:name this refers to genre.name
+ */
 
 app.get(
     '/books/genre/:name',
@@ -100,7 +110,10 @@ app.get(
     }
 );
 
-// individual book by author
+/**
+ * get request to return the author infp
+ * /books/author/:name
+ */
 
 app.get(
     '/books/author/:name',
@@ -118,7 +131,9 @@ app.get(
     }
 );
 
-// adds user
+/** post method to add user
+ * /users post a json of the username, password email, and birhtday
+ */
 
 app.post(
     '/users',
@@ -182,7 +197,10 @@ app.get(
     }
 );
 
-// post new book
+/**
+ * post method to add a new title to the existing database
+ * /books has also posts as a json following the format
+ */
 
 app.post(
     '/books',
@@ -226,7 +244,10 @@ app.post(
     }
 );
 
-// get specific user
+/**
+ * get method getting user details
+ * /users/:username
+ */
 
 app.get(
     '/users/:username',
@@ -243,7 +264,10 @@ app.get(
     }
 );
 
-// update certain details
+/**
+ * put method to update user info
+ * /users/:username
+ */
 
 app.put(
     '/users/:username',
@@ -272,7 +296,10 @@ app.put(
     }
 );
 
-// add favoriteBook
+/** a
+ * post a users favorite book
+ * users/username/books/bookId
+ */
 
 app.post(
     '/users/:username/books/:bookId',
@@ -297,7 +324,10 @@ app.post(
     }
 );
 
-// removes favorite book
+/**
+ * delete users favorite book
+ * /users/username/books/bookId
+ */
 
 app.delete(
     '/users/:username/books/:bookId',
@@ -322,7 +352,10 @@ app.delete(
     }
 );
 
-// removes an entry
+/**
+ * removes a book from the database
+ * delete /books/id
+ */
 
 app.delete(
     '/books/:id',
@@ -341,7 +374,10 @@ app.delete(
     }
 );
 
-// removes user by username
+/**
+ *  delete user account
+ * /users/username
+ * */
 
 app.delete(
     '/users/:username',
